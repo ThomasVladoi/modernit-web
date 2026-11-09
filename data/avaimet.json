@@ -1,0 +1,14 @@
+[
+  {
+    "key": "kayttaja-avain-123",
+    "username": "matti",
+    "name": "Matti Meikalainen",
+    "role": "kayttaja"
+  },
+  {
+    "key": "yllapitaja-avain-456",
+    "username": "admin",
+    "name": "Ylläpitäjä",
+    "role": "yllapitaja"
+  }
+]
