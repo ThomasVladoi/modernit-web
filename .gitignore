@@ -147,3 +147,11 @@ vite.config.ts.timestamp-*
 
 # Turbo Repo
 .turbo
+
+# Node.js
+node_modules/
+
+# API-avaimet
+
+# Ympäristömuuttujat
+.env
