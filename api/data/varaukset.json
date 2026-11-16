@@ -63,14 +63,6 @@
       "aihe": "Infotilaisuus"
     },
     {
-      "id": "955bdf81-2c47-46e2-9747-6b35635d5a34",
-      "tila": "A101",
-      "alku": "2026-11-16T13:00",
-      "loppu": "2026-11-16T14:00",
-      "varaaja": "Testaaja",
-      "aihe": "Testivaraus"
-    },
-    {
       "id": "abecbc9a-4259-48c5-bcc9-eb6de5a6ed27",
       "tila": "A101",
       "alku": "2026-11-26T13:00",

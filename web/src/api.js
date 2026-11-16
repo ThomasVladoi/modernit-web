@@ -1,12 +1,30 @@
 
 const API = '/api';
 
+// Tarkistaa vastauksen ja ilmoittaa virheestä sekä tilakoodista.
+async function tarkistaVastaus(vastaus, oletus) {
+  if (!vastaus.ok) {
+    let data = {};
+
+    try {
+      data = await vastaus.json();
+    } catch {
+      // Vastauksessa ei ollut JSON-muotoista virheilmoitusta.
+    }
+
+    throw new Error(
+      `${data?.virhe || oletus} (HTTP ${vastaus.status})`
+    );
+  }
+}
+
 export async function haeTilat() {
   const vastaus = await fetch(`${API}/tilat`);
 
-  if (!vastaus.ok) {
-    throw new Error('Tilojen hakeminen epäonnistui.');
-  }
+  await tarkistaVastaus(
+    vastaus,
+    'Tilojen hakeminen epäonnistui.'
+  );
 
   return vastaus.json();
 }
@@ -21,9 +39,10 @@ export async function haeVaraukset(tila, paiva) {
     `${API}/varaukset?${parametrit}`
   );
 
-  if (!vastaus.ok) {
-    throw new Error('Varausten hakeminen epäonnistui.');
-  }
+  await tarkistaVastaus(
+    vastaus,
+    'Varausten hakeminen epäonnistui.'
+  );
 
   return vastaus.json();
 }
@@ -37,15 +56,16 @@ export async function lisaaVaraus(varaus) {
     body: JSON.stringify(varaus),
   });
 
-  const data = vastaus.status === 204
-    ? null
-    : await vastaus.json();
+  await tarkistaVastaus(
+    vastaus,
+    'Varauksen lisääminen epäonnistui.'
+  );
 
-  if (!vastaus.ok) {
-    throw new Error(data?.virhe || 'Varauksen lisääminen epäonnistui.');
+  if (vastaus.status === 204) {
+    return null;
   }
 
-  return data;
+  return vastaus.json();
 }
 
 export async function poistaVaraus(id) {
@@ -53,7 +73,8 @@ export async function poistaVaraus(id) {
     method: 'DELETE',
   });
 
-  if (!vastaus.ok) {
-    throw new Error('Varauksen poistaminen epäonnistui.');
-  }
+  await tarkistaVastaus(
+    vastaus,
+    'Varauksen poistaminen epäonnistui.'
+  );
 }

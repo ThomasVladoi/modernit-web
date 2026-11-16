@@ -1,6 +1,11 @@
 
 import { useEffect, useState } from 'react';
-import { haeTilat, haeVaraukset, lisaaVaraus, poistaVaraus } from './api';
+import {
+  haeTilat,
+  haeVaraukset,
+  lisaaVaraus,
+  poistaVaraus
+} from './api';
 
 export default function Varauskalenteri() {
   const [tilat, setTilat] = useState([]);
@@ -30,6 +35,7 @@ export default function Varauskalenteri() {
     if (!tila || !paiva) return;
 
     setLataa(true);
+
     try {
       const data = await haeVaraukset(tila, paiva);
       setVaraukset(data);
@@ -41,8 +47,39 @@ export default function Varauskalenteri() {
     }
   }
 
+  // Haetaan varaukset aina, kun tila tai päivä vaihtuu.
+  // Siivous estää vanhan hakupyynnön tuloksen käyttämisen.
   useEffect(() => {
-    paivitaVaraukset();
+    let peruttu = false;
+
+    async function haePaivanVaraukset() {
+      if (!tila || !paiva) return;
+
+      setLataa(true);
+
+      try {
+        const data = await haeVaraukset(tila, paiva);
+
+        if (!peruttu) {
+          setVaraukset(data);
+          setVirhe('');
+        }
+      } catch (error) {
+        if (!peruttu) {
+          setVirhe(error.message);
+        }
+      } finally {
+        if (!peruttu) {
+          setLataa(false);
+        }
+      }
+    }
+
+    haePaivanVaraukset();
+
+    return () => {
+      peruttu = true;
+    };
   }, [tila, paiva]);
 
   async function teeVaraus(event) {
@@ -64,6 +101,7 @@ export default function Varauskalenteri() {
       setAihe('');
       setAlku('');
       setLoppu('');
+
       await paivitaVaraukset();
     } catch (error) {
       setVirhe(error.message);
@@ -71,7 +109,9 @@ export default function Varauskalenteri() {
   }
 
   async function poista(id) {
-    if (!window.confirm('Haluatko varmasti poistaa varauksen?')) return;
+    if (!window.confirm('Haluatko varmasti poistaa varauksen?')) {
+      return;
+    }
 
     try {
       await poistaVaraus(id);
@@ -92,7 +132,10 @@ export default function Varauskalenteri() {
       <section className="valinnat">
         <label>
           Valitse tila
-          <select value={tila} onChange={(e) => setTila(e.target.value)}>
+          <select
+            value={tila}
+            onChange={(e) => setTila(e.target.value)}
+          >
             {tilat.map((t) => (
               <option key={t.id} value={t.id}>
                 {t.nimi} ({t.id})
@@ -126,11 +169,11 @@ export default function Varauskalenteri() {
 
         {lataa && <p>Haetaan varauksia...</p>}
 
-        {!lataa && varaukset.length === 0 && (
+        {!lataa && !virhe && varaukset.length === 0 && (
           <p>Ei varauksia valittuna päivänä.</p>
         )}
 
-        {varaukset.map((v) => (
+        {!lataa && varaukset.map((v) => (
           <article className="varaus" key={v.id}>
             <div>
               <strong>
@@ -140,7 +183,10 @@ export default function Varauskalenteri() {
               {v.aihe && <p>Aihe: {v.aihe}</p>}
             </div>
 
-            <button type="button" onClick={() => poista(v.id)}>
+            <button
+              type="button"
+              onClick={() => poista(v.id)}
+            >
               Poista
             </button>
           </article>
@@ -188,7 +234,10 @@ export default function Varauskalenteri() {
             />
           </label>
 
-          <button type="submit" disabled={!tila || !varaaja.trim()}>
+          <button
+            type="submit"
+            disabled={!tila || !varaaja.trim()}
+          >
             Tee varaus
           </button>
         </form>
