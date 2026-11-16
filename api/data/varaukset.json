@@ -69,6 +69,14 @@
       "loppu": "2026-11-26T14:00",
       "varaaja": "Kalle",
       "aihe": "Testaaja"
+    },
+    {
+      "id": "453af608-c28e-4e4e-b776-0eb463771ae9",
+      "tila": "A101",
+      "alku": "2026-11-16T13:00",
+      "loppu": "2026-11-16T14:00",
+      "varaaja": "Testaaja",
+      "aihe": "Varaus"
     }
   ]
 }
